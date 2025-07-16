@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEW CLICKER - Professional Trading Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .trading-interface {
+            display: grid;
+            grid-template-columns: 380px 1fr 340px;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+        }
+        
+        .sidebar-left {
+            background: linear-gradient(180deg, #f8f8f8 0%, #ffffff 100%);
+            border-right: 1px solid #cccccc;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-section {
+            padding: 24px;
+            border-bottom: 1px solid #dddddd;
+        }
+        
+        .brand {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: #D4AF37;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+        }
+        
+        .subtitle {
+            font-size: 11px;
+            color: #666666;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metrics-container {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            border-bottom: 1px solid #dddddd;
+        }
+        
+        .metric-box {
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            padding: 16px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .metric-box:hover {
+            border-color: #D4AF37;
+            background: #ebebeb;
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: #D4AF37;
+        }
+        
+        .trading-panel {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .trade-option {
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-radius: 4px;
+        }
+        
+        .trade-option:hover {
+            background: #e5e5e5;
+            border-color: #D4AF37;
+        }
+        
+        .trade-option.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .trade-option.disabled:hover {
+            background: #f0f0f0;
+            border-color: #d0d0d0;
+        }
+        
+        .trade-symbol {
+            width: 40px;
+            height: 40px;
+            background: #d0d0d0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 16px;
+            color: #D4AF37;
+        }
+        
+        .trade-details {
+            flex: 1;
+        }
+        
+        .trade-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 2px;
+        }
+        
+        .trade-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #D4AF37;
+            font-weight: 500;
+        }
+        
+        .main-terminal {
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-left: 1px solid #cccccc;
+            border-right: 1px solid #cccccc;
+        }
+        
+        .terminal-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.02) 0%, transparent 70%);
+        }
+        
+        .main-interface {
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        
+        .main-interface:hover {
+            transform: scale(1.02);
+        }
+        
+        .main-interface:active {
+            transform: scale(0.98);
+        }
+        
+        .interface-core {
+            width: 240px;
+            height: 240px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+            border: 2px solid #cccccc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .interface-core::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            animation: scan 4s infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .core-logo {
+            width: 120px;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666666;
+            font-size: 12px;
+            text-align: center;
+            border: 2px dashed #cccccc;
+        }
+        
+        .core-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .click-indicator {
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: #D4AF37;
+            pointer-events: none;
+            opacity: 0;
+            animation: valueRise 0.8s ease-out;
+        }
+        
+        @keyframes valueRise {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-40px); }
+        }
+        
+        .status-message {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #D4AF37;
+            opacity: 0;
+            transition: all 0.3s ease;
+            border: 1px solid #cccccc;
+        }
+        
+        .status-message.active {
+            opacity: 1;
+            bottom: -50px;
+        }
+        
+        .sidebar-right {
+            background: linear-gradient(180deg, #f8f8f8 0%, #ffffff 100%);
+            border-left: 1px solid #cccccc;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .rankings-section {
+            flex: 1;
+            padding: 24px;
+            border-bottom: 1px solid #dddddd;
+        }
+        
+        .rankings-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .ranking-item:hover {
+            background: #e5e5e5;
+            border-color: #D4AF37;
+        }
+        
+        .rank-position {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: #D4AF37;
+            width: 24px;
+        }
+        
+        .rank-trader {
+            font-size: 11px;
+            color: #333333;
+            flex: 1;
+            margin-left: 12px;
+        }
+        
+        .rank-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #D4AF37;
+            font-weight: 500;
+        }
+        
+        .system-controls {
+            padding: 24px;
+        }
+        
+        .control-group {
+            margin-bottom: 16px;
+        }
+        
+        .control-label {
+            font-size: 11px;
+            color: #666666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .system-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .system-switch:hover {
+            border-color: #D4AF37;
+        }
+        
+        .switch-label {
+            font-size: 11px;
+            color: #333333;
+        }
+        
+        .switch-toggle {
+            width: 32px;
+            height: 16px;
+            background: #cccccc;
+            border-radius: 8px;
+            position: relative;
+            transition: background 0.2s ease;
+        }
+        
+        .switch-toggle.active {
+            background: #D4AF37;
+        }
+        
+        .switch-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+        
+        .switch-toggle.active::after {
+            transform: translateX(16px);
+        }
+        
+        .reset-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #D4AF37, #B8941F);
+            border: none;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: #000000;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 16px;
+        }
+        
+        .reset-button:hover {
+            background: linear-gradient(135deg, #B8941F, #D4AF37);
+            transform: translateY(-1px);
+        }
+        
+        .reset-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .reset-button:disabled:hover {
+            transform: none;
+        }
+        
+        .version-tag {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: #999999;
+            margin-top: 16px;
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"><path d="M0 0h50v50H0z" fill="none"/><path d="M0 0h1v50H0zM0 0h50v1H0z" fill="rgba(0,0,0,0.05)"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @media (max-width: 1400px) {
+            .trading-interface {
+                grid-template-columns: 320px 1fr 280px;
+            }
+            
+            .interface-core {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .core-logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    
+    <div class="trading-interface">
+        <!-- Left Sidebar -->
+        <div class="sidebar-left">
+            <div class="header-section">
+                <div class="brand">JEW.CLICKER</div>
+                <div class="subtitle">Professional Trading Terminal</div>
+            </div>
+            
+            <div class="metrics-container">
+                <div class="metric-box">
+                    <div class="metric-label">Balance</div>
+                    <div class="metric-value" id="balance-display">0</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Guilt Index</div>
+                    <div class="metric-value" id="guilt-display">0</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Rate/Sec</div>
+                    <div class="metric-value" id="rate-display">0</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Level</div>
+                    <div class="metric-value" id="level-display">1</div>
+                </div>
+            </div>
+            
+            <div class="trading-panel">
+                <div class="section-title">Trading Positions</div>
+                <div class="trade-option" data-cost="15" data-type="auto">
+                    <div class="trade-symbol">⚡</div>
+                    <div class="trade-details">
+                        <div class="trade-name">Auto-Miners</div>
+                        <div class="trade-price">15.00 BAL</div>
+                    </div>
+                </div>
+                <div class="trade-option" data-cost="75" data-type="multiplier">
+                    <div class="trade-symbol">📈</div>
+                    <div class="trade-details">
+                        <div class="trade-name">Click Multiplier</div>
+                        <div class="trade-price">75.00 BAL</div>
+                    </div>
+                </div>
+                <div class="trade-option" data-cost="150" data-type="passive">
+                    <div class="trade-symbol">🔄</div>
+                    <div class="trade-details">
+                        <div class="trade-name">Passive Income</div>
+                        <div class="trade-price">150.00 BAL</div>
+                    </div>
+                </div>
+                <div class="trade-option" data-cost="400" data-type="premium">
+                    <div class="trade-symbol">💎</div>
+                    <div class="trade-details">
+                        <div class="trade-name">Premium Node</div>
+                        <div class="trade-price">400.00 BAL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Terminal -->
+        <div class="main-terminal">
+            <div class="terminal-bg"></div>
+            <div class="main-interface" id="main-click">
+                <div class="interface-core">
+                    <div class="core-logo">
+                        <!-- Replace this with your logo image -->
+                        <img src="Proof Of Jew (2).png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none;">LOGO<br>PLACEHOLDER</div>
+                    </div>
+                </div>
+                <div class="status-message" id="status-msg"></div>
+            </div>
+        </div>
+        
+        <!-- Right Sidebar -->
+        <div class="sidebar-right">
+            <div class="rankings-section">
+                <div class="rankings-header">Global Rankings</div>
+                <div class="ranking-item">
+                    <div class="rank-position">01</div>
+                    <div class="rank-trader">@RabbiRugPull</div>
+                    <div class="rank-value">1.2M</div>
+                </div>
+                <div class="ranking-item">
+                    <div class="rank-position">02</div>
+                    <div class="rank-trader">@BagelDegen</div>
+                    <div class="rank-value">890K</div>
+                </div>
+                <div class="ranking-item">
+                    <div class="rank-position">03</div>
+                    <div class="rank-trader">@Chadstein420</div>
+                    <div class="rank-value">756K</div>
+                </div>
+                <div class="ranking-item">
+                    <div class="rank-position">04</div>
+                    <div class="rank-trader">@KosherKing</div>
+                    <div class="rank-value">623K</div>
+                </div>
+                <div class="ranking-item">
+                    <div class="rank-position">05</div>
+                    <div class="rank-trader">@ShalomShark</div>
+                    <div class="rank-value">445K</div>
+                </div>
+                <div class="ranking-item">
+                    <div class="rank-position">06</div>
+                    <div class="rank-trader">@MatzoMoon</div>
+                    <div class="rank-value">334K</div>
+                </div>
+                <div class="ranking-item">
+                    <div class="rank-position">07</div>
+                    <div class="rank-trader">@GefilteGains</div>
+                    <div class="rank-value">298K</div>
+                </div>
+            </div>
+            
+            <div class="system-controls">
+                <div class="control-group">
+                    <div class="control-label">System Controls</div>
+                    <div class="system-switch" id="audio-toggle">
+                        <span class="switch-label">Audio Feedback</span>
+                        <div class="switch-toggle active"></div>
+                    </div>
+                </div>
+                
+                <button class="reset-button" id="reset-system">System Reset</button>
+                
+                <div class="version-tag">
+                    v2.1.0-prod | Terminal Build
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System State
+        let systemState = {
+            balance: 0,
+            guilt: 0,
+            rate: 0,
+            level: 1,
+            positions: {
+                auto: 0,
+                multiplier: 0,
+                passive: 0,
+                premium: 0
+            },
+            audioEnabled: true,
+            clickValue: 1
+        };
+
+        // Status messages
+        const statusMessages = [
+            "Processing transaction...",
+            "Blockchain confirmed",
+            "Guilt accumulation detected",
+            "Position opened successfully",
+            "Mining rewards distributed",
+            "Network synchronization complete",
+            "Smart contract executed"
+        ];
+
+        // DOM References
+        const mainClick = document.getElementById('main-click');
+        const statusMsg = document.getElementById('status-msg');
+        const balanceDisplay = document.getElementById('balance-display');
+        const guiltDisplay = document.getElementById('guilt-display');
+        const rateDisplay = document.getElementById('rate-display');
+        const levelDisplay = document.getElementById('level-display');
+        const tradeOptions = document.querySelectorAll('.trade-option');
+        const audioToggle = document.getElementById('audio-toggle');
+        const resetSystem = document.getElementById('reset-system');
+
+        // Click feedback system
+        function showClickFeedback(x, y) {
+            const indicator = document.createElement('div');
+            indicator.className = 'click-indicator';
+            indicator.textContent = `+${systemState.clickValue}`;
+            indicator.style.left = x + 'px';
+            indicator.style.top = y + 'px';
+            indicator.style.position = 'fixed';
+            indicator.style.pointerEvents = 'none';
+            indicator.style.zIndex = '1000';
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                if (document.body.contains(indicator)) {
+                    document.body.removeChild(indicator);
+                }
+            }, 800);
+        }
+
+        // Main click handler
+        mainClick.addEventListener('click', (e) => {
+            const rect = mainClick.getBoundingClientRect();
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            systemState.balance += systemState.clickValue;
+            systemState.guilt += Math.floor(Math.random() * 3);
+            
+            showClickFeedback(x, y);
+            
+            // Show status message occasionally
+            if (Math.random() < 0.25) {
+                const message = statusMessages[Math.floor(Math.random() * statusMessages.length)];
+                statusMsg.textContent = message;
+                statusMsg.classList.add('active');
+                
+                setTimeout(() => {
+                    statusMsg.classList.remove('active');
+                }, 2500);
+            }
+            
+            updateDisplay();
+        });
+
+        // Trading system
+        tradeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const cost = parseInt(option.dataset.cost);
+                const type = option.dataset.type;
+                
+                if (systemState.balance >= cost && !option.classList.contains('disabled')) {
+                    systemState.balance -= cost;
+                    systemState.positions[type]++;
+                    
+                    // Update cost with exponential scaling
+                    const newCost = Math.floor(cost * Math.pow(1.6, systemState.positions[type]));
+                    option.dataset.cost = newCost;
+                    option.querySelector('.trade-price').textContent = `${newCost.toFixed(2)} BAL`;
+                    
+                    // Apply position effects
+                    switch(type) {
+                        case 'auto':
+                            systemState.rate += 1;
+                            break;
+                        case 'multiplier':
+                            systemState.clickValue += 15;
+                            break;
+                        case 'passive':
+                            systemState.rate += 8;
+                            break;
+                        case 'premium':
+                            systemState.rate += 25;
+                            break;
+                    }
+                    
+                    updateDisplay();
+                }
+            });
+        });
+
+        // Audio toggle
+        audioToggle.addEventListener('click', () => {
+            systemState.audioEnabled = !systemState.audioEnabled;
+            const toggle = audioToggle.querySelector('.switch-toggle');
+            toggle.classList.toggle('active', systemState.audioEnabled);
+        });
+
+        // Reset system
+        resetSystem.addEventListener('click', () => {
+            if (systemState.balance >= 1500) {
+                const levelBonus = Math.floor(systemState.balance / 1500);
+                systemState.balance = 0;
+                systemState.guilt = 0;
+                systemState.rate = 0;
+                systemState.level += levelBonus;
+                systemState.clickValue = 1 + (systemState.level - 1) * 0.8;
+                
+                // Reset positions
+                systemState.positions = {
+                    auto: 0,
+                    multiplier: 0,
+                    passive: 0,
+                    premium: 0
+                };
+                
+                // Reset costs
+                const baseCosts = { auto: 15, multiplier: 75, passive: 150, premium: 400 };
+                tradeOptions.forEach(option => {
+                    const type = option.dataset.type;
+                    option.dataset.cost = baseCosts[type];
+                    option.querySelector('.trade-price').textContent = `${baseCosts[type].toFixed(2)} BAL`;
+                });
+                
+                updateDisplay();
+            }
+        });
+
+        // Update display
+        function updateDisplay() {
+            balanceDisplay.textContent = systemState.balance.toLocaleString();
+            guiltDisplay.textContent = systemState.guilt.toLocaleString();
+            rateDisplay.textContent = systemState.rate.toLocaleString();
+            levelDisplay.textContent = systemState.level;
+            
+            // Update trade option states
+            tradeOptions.forEach(option => {
+                const cost = parseInt(option.dataset.cost);
+                if (systemState.balance >= cost) {
+                    option.classList.remove('disabled');
+                } else {
+                    option.classList.add('disabled');
+                }
+            });
+            
+            // Update reset button
+            resetSystem.disabled = systemState.balance < 1500;
+        }
+
+        // Passive income
+        setInterval(() => {
+            if (systemState.rate > 0) {
+                systemState.balance += systemState.rate;
+                updateDisplay();
+            }
+        }, 1000);
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
